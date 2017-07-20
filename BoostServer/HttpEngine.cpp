@@ -10,10 +10,9 @@
 using std::string;
 using std::ifstream;
 
-const string errorResponseString =
-	"HTTP/1.1 404 Not Found\r\n" \
-	"Connection: Keep-Alive\r\n" \
-	"\r\n" \
+std::ofstream logFile("C:/log.txt", std::ofstream::app);
+
+const string pageNotFound =
 	"<!DOCTYPE html>" \
 	"<html>" \
 		"<head>" \
@@ -21,16 +20,27 @@ const string errorResponseString =
 		"</head>" \
 	"</html>";
 
-const string badResponseString =
-	"HTTP/1.1 200 OK\r\n" \
-	"Connection: Keep-Alive\r\n" \
-	"\r\n" \
+const string errorResponseString =
+	"HTTP/1.1 404 Not Found\r\n" \
+	"Content-Type: text/html\r\n" \
+	"Content-Length: " + boost::lexical_cast<string>(pageNotFound.size()) + "\r\n" \
+	"Connection: Closed\r\n" \
+	"\r\n" + pageNotFound;
+
+const string fileDoesNotExist =
 	"<!DOCTYPE html>" \
 	"<html>" \
 		"<head>" \
 			"<h1 align=\"center\">FILE DOES NOT EXIST</h1>" \
 		"</head>" \
 	"</html>";
+
+const string badResponseString =
+	"HTTP/1.1 200 OK\r\n" \
+	"Content-Type: text/html\r\n" \
+	"Content-Length: " + boost::lexical_cast<string>(fileDoesNotExist.size()) + "\r\n" \
+	"Connection: Closed\r\n" \
+	"\r\n" + fileDoesNotExist;
 
 string HttpEngine::getHttpResponse(std::iostream & stream)
 {
@@ -66,15 +76,15 @@ string HttpEngine::constuctGoodResponseString(const string & filePath, std::ifst
 {
 	fileStream.seekg(0, fileStream.end);
 	int len = fileStream.tellg();
+	fileStream.seekg(0, fileStream.beg);
 	string goodResponseString = string(
 		"HTTP/1.1 200 OK\r\n" \
-		"Connection: Keep-Alive\r\n" \
+		"Connection: Closed\r\n" \
 		"Content-Type: application/octet-stream\r\n" \
 		"Content-Disposition: attachment; filename=\"" + filePath + "\"\r\n" \
 		"Content-Length: " + boost::lexical_cast<string>(len) + "\r\n" \
 		"\r\n"
 	);
-	fileStream.seekg(0, fileStream.beg);
 	std::vector<char> bytes;
 	bytes.reserve(len);
 	char byte;
