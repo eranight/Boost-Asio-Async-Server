@@ -56,7 +56,7 @@ bool HttpEngine::checkHttpGetFormat(std::iostream & stream, string & filePath)
 	std::copy(std::istream_iterator<string>(stream), std::istream_iterator<string>(), std::back_inserter(logvector));
 	if (logvector[0] == "GET")
 	{
-		filePath = getCorrectingFilePath(logvector[1]);
+		filePath = getCorrectFilePath(logvector[1]);
 		return true;
 	}
 	return false;
@@ -83,7 +83,7 @@ string HttpEngine::constuctGoodResponseString(const string & filePath, std::ifst
 	return goodResponseString;
 }
 
-string HttpEngine::getCorrectingFilePath(string filePath)
+string HttpEngine::getCorrectFilePath(string filePath)
 {
 	string result;
 	string getstr = "/get/";

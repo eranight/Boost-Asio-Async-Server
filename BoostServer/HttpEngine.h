@@ -15,6 +15,6 @@ public:
 private:
 	static bool checkHttpGetFormat(std::iostream & stream, std::string & filePath);
 	static std::string constuctGoodResponseString(const std::string & filePath, std::ifstream & fileStream);
-	static std::string getCorrectingFilePath(std::string filePath);
+	static std::string getCorrectFilePath(std::string filePath);
 };
 
