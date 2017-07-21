@@ -13,8 +13,7 @@ using std::cout;
 using std::endl;
 
 Client::Client(asio::io_service & ioService) :
-	socket(ioService),
-	sendFileState(false)
+	socket(ioService)
 {
 
 }
@@ -22,12 +21,6 @@ Client::Client(asio::io_service & ioService) :
 Client::tptr Client::create(asio::io_service & ioService)
 {
 	return tptr(new Client(ioService));
-}
-
-Client::~Client()
-{
-	if (sendFileState && responseFile.is_open())
-		responseFile.close();
 }
 
 void Client::start()
@@ -53,10 +46,7 @@ void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNu
 		{
 			responseFile.open(fileName, filesystem::ifstream::binary);
 			if (responseFile.good())
-			{
 				response = http.getGoodResponseHeader(fileName, filesystem::file_size(fileName));
-				sendFileState = true;
-			}
 			else
 				response = http.getFileNotExistResponse(fileName);
 		}
@@ -68,8 +58,12 @@ void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNu
 void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
+	{
 		cerr << "write error: " << errorCode.message() << endl;
-	else if (sendFileState)
+		if (responseFile.is_open())
+			responseFile.close();
+	}
+	else if (responseFile.is_open())
 	{
 		responseFile.read(responseBuffer.c_array(), responseBuffer.size());
 		std::streamsize bytesCount = responseFile.gcount();
@@ -79,7 +73,6 @@ void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesN
 		if (responseFile.eof())
 		{
 			responseFile.close();
-			sendFileState = false;
 			cout << "The file successfully sent!" << endl;
 		}
 	}

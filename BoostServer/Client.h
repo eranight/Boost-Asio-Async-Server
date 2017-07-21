@@ -15,15 +15,12 @@ private:
 	boost::asio::ip::tcp::socket socket;
 	boost::filesystem::ifstream responseFile;
 	boost::array<char, 1024> responseBuffer;
-	bool sendFileState;
 
 	Client(boost::asio::io_service & ioService);
 public:
 	typedef boost::shared_ptr<Client> tptr;
 
 	static tptr create(boost::asio::io_service & ioService);
-
-	~Client();
 
 	void start();
 
