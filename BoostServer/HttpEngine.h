@@ -3,18 +3,23 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 class HttpEngine
 {
 private:
 	HttpEngine() {}
+	std::vector<std::string> requestVector;
 
 public:
-	static std::string getHttpResponse(std::iostream & stream);
+	enum class HttpType { GET = 0, OTHER };
+	HttpEngine(std::istream & stream);
+	HttpType getRequestType();
+	std::string getFileName(std::string ignoredPrefix = "/get/");
 
-private:
-	static bool checkHttpGetFormat(std::iostream & stream, std::string & filePath);
-	static std::string constuctGoodResponseString(const std::string & filePath, std::ifstream & fileStream);
-	static std::string getCorrectFilePath(std::string filePath);
+	friend std::ostream & operator<<(std::ostream & os, const HttpEngine & http);
+
+	std::string getPageNotFoundResponse();
+	std::string getFileNotExistResponse(const std::string & fileName);
+	std::string getGoodResponseHeader(const std::string & fileName, int fileSize);
 };
-

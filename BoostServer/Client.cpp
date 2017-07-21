@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 #include "HttpEngine.h"
 
@@ -37,11 +38,25 @@ void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNu
 	else
 	{
 		cout << "The reading from the socket ended successfully!" << endl;
-		std::iostream streamRequest(&request);
-		response = HttpEngine::getHttpResponse(streamRequest);
+		std::istream streamRequest(&request);
+		HttpEngine http(streamRequest);
+		if (http.getRequestType() != HttpEngine::HttpType::GET)
+			response = http.getPageNotFoundResponse();
+		else
+		{
+			std::string fileName = http.getFileName();
+			if (fileName.empty())
+				response = http.getPageNotFoundResponse();
+			else if (boost::filesystem::exists(boost::filesystem::path(fileName)))
+			{
+
+			}
+			else
+				response = http.getFileNotExistResponse(fileName);
+		}
 		asio::async_write(socket, asio::buffer(response),
 			bind(&Client::onWriteCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred)
-		);		
+		);
 	}
 }
 
