@@ -27,8 +27,6 @@ public:
 
 	void start();
 
-	void stop();
-
 	boost::asio::ip::tcp::socket & getSocket() { return socket; }
 
 private:

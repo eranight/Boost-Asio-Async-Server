@@ -9,6 +9,8 @@ using std::endl;
 
 int main(int argn, char * argc[])
 {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 	if (argn != 2)
 	{
 		cerr << "invalide arguments number!" << endl;

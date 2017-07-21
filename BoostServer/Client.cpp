@@ -26,22 +26,16 @@ Client::tptr Client::create(asio::io_service & ioService)
 
 Client::~Client()
 {
-	stop();
+	if (sendFileState && responseFile.is_open())
+		responseFile.close();
 }
 
 void Client::start()
 {
+	cout << "start read" << endl;
 	asio::async_read_until(socket, request, "\r\n",
 		bind(&Client::onReadCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred)
 	);
-}
-
-void Client::stop()
-{
-	if (sendFileState && responseFile)
-		responseFile.close();
-	if (socket.is_open())
-		socket.close();
 }
 
 void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNum)
@@ -87,9 +81,6 @@ void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesN
 			responseFile.close();
 			sendFileState = false;
 			cout << "The file successfully sent!" << endl;
-			start();
 		}
 	}
-	else
-		start();
 }
