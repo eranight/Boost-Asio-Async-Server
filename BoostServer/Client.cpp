@@ -47,10 +47,7 @@ void Client::stop()
 void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
-	{
 		cerr << "read error: " << errorCode.message() << endl;
-		stop();
-	}
 	else
 	{
 		std::istream streamRequest(&request);
@@ -77,10 +74,7 @@ void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNu
 void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
-	{
 		cerr << "write error: " << errorCode.message() << endl;
-		stop();
-	}
 	else if (sendFileState)
 	{
 		responseFile.read(responseBuffer.c_array(), responseBuffer.size());
