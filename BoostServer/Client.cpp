@@ -34,7 +34,10 @@ void Client::start()
 void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
+	{
 		cerr << "read error: " << errorCode.message() << endl;
+		socket.close();
+	}
 	else
 	{
 		std::istream streamRequest(&request);
@@ -62,6 +65,7 @@ void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesN
 		cerr << "write error: " << errorCode.message() << endl;
 		if (responseFile.is_open())
 			responseFile.close();
+		socket.close();
 	}
 	else if (responseFile.is_open())
 	{
@@ -73,6 +77,7 @@ void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesN
 		if (responseFile.eof())
 		{
 			responseFile.close();
+			socket.close();
 			cout << "the file sent" << endl;
 		}
 	}
