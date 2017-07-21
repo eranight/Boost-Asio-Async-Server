@@ -29,5 +29,7 @@ public:
 private:
 	void onReadCallback(const boost::system::error_code & errorCode, size_t bytesNum);
 	void onWriteCallback(const boost::system::error_code & errorCode, size_t bytesNum);
+
+	std::string getFileName(const std::string & path);
 };
 

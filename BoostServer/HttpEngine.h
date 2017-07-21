@@ -12,10 +12,10 @@ private:
 	std::vector<std::string> requestVector;
 
 public:
-	enum class HttpType { GET = 0, OTHER };
+	enum class HttpMethod { GET = 0, OTHER };
 	HttpEngine(std::istream & stream);
-	HttpType getRequestType();
-	std::string getFileName(std::string ignoredPrefix = "/get/");
+	HttpMethod getRequestMethod();
+	std::string getURL();
 
 	friend std::ostream & operator<<(std::ostream & os, const HttpEngine & http);
 

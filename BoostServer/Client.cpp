@@ -39,8 +39,8 @@ void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNu
 	{
 		std::istream streamRequest(&request);
 		HttpEngine http(streamRequest);
-		std::string fileName = http.getFileName();
-		if (http.getRequestType() != HttpEngine::HttpType::GET || fileName.empty())
+		std::string fileName = getFileName(http.getURL());
+		if (http.getRequestMethod() != HttpEngine::HttpMethod::GET || fileName.empty())
 			response = http.getPageNotFoundResponse();
 		else
 		{
@@ -73,7 +73,13 @@ void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesN
 		if (responseFile.eof())
 		{
 			responseFile.close();
-			cout << "The file successfully sent!" << endl;
+			cout << "the file sent" << endl;
 		}
 	}
+}
+
+std::string Client::getFileName(const std::string & path)
+{
+	const std::string gtstr = "/get/";
+	return path.find(gtstr) == 0 ? path.substr(gtstr.size()) : std::string();
 }

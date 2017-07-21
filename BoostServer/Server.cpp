@@ -29,7 +29,7 @@ void Server::nextAccept()
 
 void Server::handleAccept(Client::tptr client, const system::error_code & errorCode)
 {
-	cout << "The socket accepted!" << endl;
+	cout << "the socket accepted" << endl;
 	if (errorCode == 0)
 		client->start();
 	else

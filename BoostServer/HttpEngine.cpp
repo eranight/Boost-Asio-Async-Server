@@ -11,6 +11,9 @@ using std::string;
 using std::istream;
 using std::ifstream;
 
+const size_t HTTP_REQUEST_METHOD = 0;
+const size_t HTTP_REQUEST_URL = 1;
+
 const string pageNotFound =
 "<!DOCTYPE html>" \
 "<html>" \
@@ -52,26 +55,24 @@ HttpEngine::HttpEngine(istream & stream)
 	std::copy(std::istream_iterator<string>(stream), std::istream_iterator<string>(), std::back_inserter(requestVector));
 }
 
-HttpEngine::HttpType HttpEngine::getRequestType()
+HttpEngine::HttpMethod HttpEngine::getRequestMethod()
 {
-	if (requestVector[0] == "GET")
-		return HttpType::GET;
-	return HttpType::OTHER;
+	if (requestVector[HTTP_REQUEST_METHOD] == "GET")
+		return HttpMethod::GET;
+	return HttpMethod::OTHER;
 }
 
-std::string HttpEngine::getFileName(std::string ignoredPrefix)
+string HttpEngine::getURL()
 {
-	if (requestVector[1].find(ignoredPrefix) == 0)
-		return requestVector[1].substr(ignoredPrefix.size());
-	return std::string();
+	return requestVector[HTTP_REQUEST_URL];
 }
 
-std::string HttpEngine::getPageNotFoundResponse()
+string HttpEngine::getPageNotFoundResponse()
 {
 	return pageNotFoundResponseString;
 }
 
-std::string HttpEngine::getFileNotExistResponse(const std::string & fileName)
+string HttpEngine::getFileNotExistResponse(const string & fileName)
 {
 	string strFileNotExist =
 		"<!DOCTYPE html>" \
@@ -85,7 +86,7 @@ std::string HttpEngine::getFileNotExistResponse(const std::string & fileName)
 		"\r\n" + strFileNotExist;
 }
 
-std::string HttpEngine::getGoodResponseHeader(const std::string & fileName, uintmax_t fileSize)
+string HttpEngine::getGoodResponseHeader(const string & fileName, uintmax_t fileSize)
 {
 	string strGoodHeaderResponse = goodResponseHeader +
 		fileName + "\"\r\n" \
