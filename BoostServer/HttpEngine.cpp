@@ -44,6 +44,7 @@ const string goodResponseHeader =
 "HTTP/1.1 200 OK\r\n" \
 "Connection: Closed\r\n" \
 "Content-Type: application/octet-stream\r\n" \
+"Content-Transfer-Encoding: Binary\r\n" \
 "Content-Disposition: attachment; filename=\"";
 
 HttpEngine::HttpEngine(istream & stream)
@@ -84,7 +85,7 @@ std::string HttpEngine::getFileNotExistResponse(const std::string & fileName)
 		"\r\n" + strFileNotExist;
 }
 
-std::string HttpEngine::getGoodResponseHeader(const std::string & fileName, int fileSize)
+std::string HttpEngine::getGoodResponseHeader(const std::string & fileName, uintmax_t fileSize)
 {
 	string strGoodHeaderResponse = goodResponseHeader +
 		fileName + "\"\r\n" \

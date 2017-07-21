@@ -21,5 +21,5 @@ public:
 
 	std::string getPageNotFoundResponse();
 	std::string getFileNotExistResponse(const std::string & fileName);
-	std::string getGoodResponseHeader(const std::string & fileName, int fileSize);
+	std::string getGoodResponseHeader(const std::string & fileName, uintmax_t fileSize);
 };

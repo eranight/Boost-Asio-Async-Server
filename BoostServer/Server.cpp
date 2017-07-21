@@ -31,11 +31,8 @@ void Server::handleAccept(Client::tptr client, const system::error_code & errorC
 {
 	cout << "The socket accepted!" << endl;
 	if (errorCode == 0)
-	{
-		cout << "The socket is starting" << endl;
 		client->start();
-	}
 	else
-		cerr << "The acceptance the socket ended with error " << errorCode << endl;
+		cerr << errorCode.message() << endl;
 	nextAccept();
 }

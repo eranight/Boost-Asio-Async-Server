@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
 
 #include "HttpEngine.h"
 
@@ -14,7 +13,8 @@ using std::cout;
 using std::endl;
 
 Client::Client(asio::io_service & ioService) :
-	socket(ioService)
+	socket(ioService),
+	sendFileState(false)
 {
 
 }
@@ -24,6 +24,11 @@ Client::tptr Client::create(asio::io_service & ioService)
 	return tptr(new Client(ioService));
 }
 
+Client::~Client()
+{
+	stop();
+}
+
 void Client::start()
 {
 	asio::async_read_until(socket, request, "\r\n",
@@ -31,42 +36,66 @@ void Client::start()
 	);
 }
 
+void Client::stop()
+{
+	if (sendFileState && responseFile)
+		responseFile.close();
+	if (socket.is_open())
+		socket.close();
+}
+
 void Client::onReadCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
-		cerr << "The reading from the socket ended with error " << errorCode << endl;
+	{
+		cerr << "read error: " << errorCode.message() << endl;
+		stop();
+	}
 	else
 	{
-		cout << "The reading from the socket ended successfully!" << endl;
 		std::istream streamRequest(&request);
 		HttpEngine http(streamRequest);
-		if (http.getRequestType() != HttpEngine::HttpType::GET)
+		std::string fileName = http.getFileName();
+		if (http.getRequestType() != HttpEngine::HttpType::GET || fileName.empty())
 			response = http.getPageNotFoundResponse();
 		else
 		{
-			std::string fileName = http.getFileName();
-			if (fileName.empty())
-				response = http.getPageNotFoundResponse();
-			else if (boost::filesystem::exists(boost::filesystem::path(fileName)))
+			responseFile.open(fileName, filesystem::ifstream::binary);
+			if (responseFile.good())
 			{
-
+				response = http.getGoodResponseHeader(fileName, filesystem::file_size(fileName));
+				sendFileState = true;
 			}
 			else
 				response = http.getFileNotExistResponse(fileName);
 		}
 		asio::async_write(socket, asio::buffer(response),
-			bind(&Client::onWriteCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred)
-		);
+			bind(&Client::onWriteCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
 	}
 }
 
 void Client::onWriteCallback(const system::error_code & errorCode, size_t bytesNum)
 {
 	if (errorCode != 0)
-		cerr << "The writing to the socket ended with error " << errorCode << endl;
-	else
 	{
-		cout << "The writing to the socket ended successfully!" << endl;
-		start();
+		cerr << "write error: " << errorCode.message() << endl;
+		stop();
 	}
+	else if (sendFileState)
+	{
+		responseFile.read(responseBuffer.c_array(), responseBuffer.size());
+		std::streamsize bytesCount = responseFile.gcount();
+		if (bytesCount > 0)
+			asio::async_write(socket, asio::buffer(responseBuffer.c_array(), bytesCount),
+				bind(&Client::onWriteCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+		if (responseFile.eof())
+		{
+			responseFile.close();
+			sendFileState = false;
+			cout << "The file successfully sent!" << endl;
+			start();
+		}
+	}
+	else
+		start();
 }
