@@ -26,7 +26,7 @@ Client::tptr Client::create(asio::io_service & ioService)
 void Client::start()
 {
 	cout << "start read" << endl;
-	asio::async_read_until(socket, request, "\r\n",
+	asio::async_read_until(socket, request, "\r\n\r\n",
 		bind(&Client::onReadCallback, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred)
 	);
 }

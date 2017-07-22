@@ -1,4 +1,5 @@
 #include <iostream>
+#include <Windows.h>
 #include <boost/lexical_cast.hpp>
 
 #include "Server.h"
@@ -39,12 +40,11 @@ int main(int argn, char * argc[])
 		cout << "start server" << endl;
 		Server server(ioService, port);
 		ioService.run();
-		cout << "stop server" << endl;
 	}
 	catch (std::exception & ex)
 	{
 		std::cerr << ex.what() << std::endl;
 	}
-
+	cout << "stop server" << endl;
 	return 0;
 }

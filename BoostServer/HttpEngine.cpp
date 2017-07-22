@@ -1,8 +1,6 @@
 #include "HttpEngine.h"
 
-#include <fstream>
 #include <vector>
-#include <algorithm>
 #include <iterator>
 
 #include <boost/lexical_cast.hpp>
@@ -50,9 +48,9 @@ const string goodResponseHeader =
 "Content-Transfer-Encoding: Binary\r\n" \
 "Content-Disposition: attachment; filename=\"";
 
-HttpEngine::HttpEngine(istream & stream)
+HttpEngine::HttpEngine(istream & stream) :
+	requestVector(std::istream_iterator<string>(stream), std::istream_iterator<string>())
 {
-	std::copy(std::istream_iterator<string>(stream), std::istream_iterator<string>(), std::back_inserter(requestVector));
 }
 
 HttpEngine::HttpMethod HttpEngine::getRequestMethod()
@@ -93,10 +91,4 @@ string HttpEngine::getGoodResponseHeader(const string & fileName, uintmax_t file
 		"Content-Length: " + boost::lexical_cast<string>(fileSize) + "\r\n" \
 		"\r\n";
 	return strGoodHeaderResponse;
-}
-
-std::ostream & operator<<(std::ostream & os, const HttpEngine & http)
-{
-	std::copy(http.requestVector.begin(), http.requestVector.end(), std::ostream_iterator<string>(os, "\r\n"));
-	return os;
 }

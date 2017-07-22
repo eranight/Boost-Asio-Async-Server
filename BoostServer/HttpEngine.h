@@ -2,7 +2,6 @@
 
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <vector>
 
 class HttpEngine
@@ -16,8 +15,6 @@ public:
 	HttpEngine(std::istream & stream);
 	HttpMethod getRequestMethod();
 	std::string getURL();
-
-	friend std::ostream & operator<<(std::ostream & os, const HttpEngine & http);
 
 	std::string getPageNotFoundResponse();
 	std::string getFileNotExistResponse(const std::string & fileName);

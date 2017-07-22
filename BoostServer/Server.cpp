@@ -16,11 +16,6 @@ Server::Server(asio::io_service & ioService, int port) :
 	nextAccept();
 }
 
-
-Server::~Server()
-{
-}
-
 void Server::nextAccept()
 {
 	shared_ptr<Client> client = Client::create(acceptor.get_io_service());
