@@ -1,5 +1,4 @@
 #include <iostream>
-#include <Windows.h>
 #include <boost/lexical_cast.hpp>
 
 #include "Server.h"
